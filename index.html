@@ -3,287 +3,594 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurelia. | Real Jewelry Shelf</title>
+    <title>Aurelia. | Final Refined Design</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        /* --- 1. Variables & Reset --- */
         :root {
-            --bg-body: #F5F2EA;
-            --primary-green: #2F5C55;
-            --card-outer: #E3DCC8;
-            --card-footer: #3E3025;
-            --gradient-start: #E69A6B;
-            --gradient-end: #C76A3D;
-            --gold: #FFD700;
+            --bg-body: #F5F2EA;       /* Lighter Cream (Body & Singles Section) */
+            --bg-alt: #EFEDE6;        /* Darker Cream (Collections Section) */
+            --primary-green: #2F5C55; 
+            --card-outer: #E3DCC8;    
+            --card-footer: #3E3025;   
+            --glass-start: rgba(230, 154, 107, 0.9);
+            --glass-end: rgba(199, 106, 61, 0.9);
+            --text-dark: #1a1a1a;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
 
         body {
             font-family: 'Lato', sans-serif;
             background-color: var(--bg-body);
+            color: var(--text-dark);
             overflow-x: hidden;
         }
 
-        /* --- Animations --- */
-        .reveal { opacity: 0; transform: translateY(40px); transition: 1s ease; }
-        .reveal.active { opacity: 1; transform: translateY(0); }
+        h1, h2, h3, .brand { font-family: 'Playfair Display', serif; }
+        a, button { transition: 0.3s; }
+        img { display: block; max-width: 100%; }
 
-        /* --- Header --- */
+        /* --- 2. Petal Cursor Animation --- */
+        .cursor-dot {
+            width: 10px; height: 10px; 
+            background-color: var(--primary-green);
+            border-radius: 50%; position: fixed; 
+            pointer-events: none; z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s;
+        }
+        body.hovering .cursor-dot { width: 20px; height: 20px; opacity: 0.5; }
+
+        .petal {
+            position: fixed; width: 12px; height: 12px;
+            background-color: rgba(230, 154, 107, 0.7);
+            border-radius: 50% 0 50% 50%; pointer-events: none; z-index: 9998;
+            opacity: 0;
+        }
+        @keyframes fall {
+            0% { transform: scale(1) translate(0, 0) rotate(0deg); opacity: 0.8; }
+            100% { transform: scale(0.6) translate(var(--drift-x), 100px) rotate(360deg); opacity: 0; }
+        }
+
+        /* --- 3. Header & Hero --- */
         header {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 5%; position: fixed; width: 100%; top: 0; z-index: 100;
-            background: rgba(245, 242, 234, 0.95); backdrop-filter: blur(8px);
+            padding: 25px 5%; position: fixed; width: 100%; top: 0; z-index: 1000;
+            background: rgba(245, 242, 234, 0.95); backdrop-filter: blur(5px);
         }
-        .brand { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--primary-green); font-weight: 700; }
-        nav ul { display: flex; gap: 30px; list-style: none; }
-        nav a { font-weight: 700; color: #555; text-decoration: none; }
-
-        /* --- Hero --- */
+        .brand { font-size: 2rem; color: var(--primary-green); font-weight: 700; letter-spacing: -0.5px; }
+        
         .hero {
-            height: 60vh; display: flex; align-items: center; justify-content: center;
-            background: url('https://images.unsplash.com/photo-1611591437281-460bfbe1220a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80') center/cover;
-            margin-bottom: 60px;
+            position: relative; margin: 100px 5% 0; height: 65vh; border-radius: 8px; overflow: hidden;
+            background: url('https://raw.githubusercontent.com/nishitatambde-hue/j/main/h.jpg') center/cover no-repeat;
+            display: flex; align-items: center;
         }
-        .hero h1 { font-family: 'Playfair Display', serif; font-size: 3.5rem; color: #fff; text-shadow: 0 4px 10px rgba(0,0,0,0.4); }
 
-        /* --- SHELF SECTION --- */
+        .hero-overlay { background: linear-gradient(90deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 60%); }
+        .hero-content { position: relative; z-index: 2; padding-left: 8%; max-width: 600px; color: #fff; }
+        .hero h1 { font-size: 3.5rem; line-height: 1.1; }
+        
+        .btn {
+            padding: 14px 35px; background-color: var(--primary-green); color: #fff;
+            border: none; border-radius: 4px; font-weight: bold; cursor: pointer;
+            font-size: 0.9rem; display: inline-block;
+        }
+        .btn:hover { background-color: #1f403b; transform: translateY(-2px); }
+
+        /* --- 4. Featured Collections (Vault Shelves - Darker BG) --- */
+        .collections { padding: 80px 5%; background-color: var(--bg-alt); }
+        .section-header { margin-bottom: 50px; text-align: center; }
+        .section-header h2 { font-size: 2.2rem; color: #222; }
+
         .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 5% 100px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px; max-width: 1200px; margin: 0 auto;
         }
 
-        /* Card Frame */
+        /* Tombstone Arch Card */
         .arch-card {
             background-color: var(--card-outer);
             border-radius: 160px 160px 0 0; 
-            padding: 15px 15px 0 15px;
-            height: 650px; 
-            display: flex;
-            flex-direction: column;
+            padding: 15px 15px 0 15px; 
+            height: 640px; 
+            display: flex; flex-direction: column;
             transition: transform 0.4s ease;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.05);
         }
         .arch-card:hover { transform: translateY(-10px); }
 
-        /* Gradient Interior */
+        /* Inner Orange Gradient */
         .card-inner {
-            background: linear-gradient(180deg, #E69A6B 0%, #C76A3D 100%);
+            background: linear-gradient(180deg, var(--glass-start) 0%, var(--glass-end) 100%);
             border: 2px solid rgba(255,255,255,0.5);
             border-radius: 145px 145px 0 0; 
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
+            flex: 1; display: flex; flex-direction: column;
+            position: relative; overflow: hidden;
+            box-shadow: inset 0 10px 20px rgba(255,255,255,0.2);
         }
 
+        /* Shelf Layout */
         .shelf-stack {
             flex: 1; display: flex; flex-direction: column;
             justify-content: space-evenly; padding: 40px 20px 20px;
         }
 
-        /* --- IMAGE & SHELF STYLING --- */
         .shelf-unit {
-            text-align: center;
-            position: relative;
-            cursor: pointer;
-            height: 120px; /* Space for the item */
-            display: flex;
-            align-items: flex-end; /* Align bottom to sit on shelf */
-            justify-content: center;
-            margin-bottom: 15px;
+            position: relative; height: 130px;
+            display: flex; align-items: flex-end; justify-content: center;
         }
 
-        /* KEY CHANGE: Using <img> instead of <i> 
-           Using filter: drop-shadow so the shadow matches the image shape 
-        */
+        /* Product Images with DEEP Shadow */
         .real-jewelry-img {
-            width: 90px;  /* Adjust based on your image size */
-            height: 90px;
-            object-fit: contain;
-            
-            /* This creates the realistic shadow behind the transparent PNG */
-            filter: drop-shadow(0 15px 10px rgba(0,0,0,0.5)); 
-            
-            z-index: 5;
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-            bottom: -5px; /* Sink slightly into the shelf reflection */
+            width: 110px; height: 90px; object-fit: contain;
+            object-position: bottom center; 
+            filter: drop-shadow(0 15px 10px rgba(0,0,0,0.7)); 
+            z-index: 5; position: relative; margin-bottom: 12px;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease;
         }
 
-        /* The Glass Shelf */
         .shelf-plank {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            height: 8px;
-            width: 70%;
-            background: linear-gradient(90deg, 
-                rgba(255,255,255,0.1) 0%, 
-                rgba(255,255,255,0.6) 50%, 
-                rgba(255,255,255,0.1) 100%);
-            border-radius: 50%;
-            box-shadow: 0 12px 15px rgba(0,0,0,0.3);
-            z-index: 4;
+            position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+            height: 6px; width: 70%;
+            background: rgba(255,255,255,0.4); border-radius: 50%;
+            box-shadow: 0 8px 10px rgba(0,0,0,0.15); z-index: 4;
         }
 
-        /* Hidden Price Tag */
-        .shelf-tag {
-            position: absolute;
-            bottom: -25px;
-            width: 100%;
-            text-align: center;
-            color: #fff;
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            opacity: 0;
-            transform: translateY(-5px);
-            transition: 0.3s;
-            pointer-events: none;
-        }
-
-        /* Hover Effects */
         .shelf-unit:hover .real-jewelry-img {
-            transform: translateY(-15px) scale(1.1); /* Hop up */
-            filter: drop-shadow(0 25px 15px rgba(0,0,0,0.4)); /* Shadow moves away */
-        }
-        .shelf-unit:hover .shelf-tag { opacity: 1; transform: translateY(0); }
-        .shelf-unit:hover .shelf-plank {
-            background: linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,1), rgba(255,255,255,0.2));
+            transform: translateY(-15px) scale(1.1);
+            filter: drop-shadow(0 30px 20px rgba(0,0,0,0.4));
         }
 
-        /* Footer */
         .card-footer {
             background-color: var(--card-footer);
             color: #fff; padding: 20px; text-align: center; z-index: 10;
         }
-        .card-footer h3 { font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 5px; color:#f0f0f0; }
+        .card-footer h3 { font-size: 1.1rem; letter-spacing: 1px; color: #f0f0f0; }
+
+        /* --- 5. Curated Singles (3D Perspective Carousel - Lighter BG) --- */
+        .singles-section { 
+            padding: 80px 0; 
+            background-color: var(--bg-body); /* Lighter Cream */
+        }
+        .singles-header { padding: 0 5%; text-align: center; margin-bottom: 50px; }
+        
+        .carousel-container {
+            display: flex;
+            overflow-x: scroll;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            scroll-snap-type: x mandatory; 
+            padding: 0 50vw;
+            align-items: center;
+            height: 450px; 
+        }
+        .carousel-container::-webkit-scrollbar { display: none; }
+
+        /* Individual Card Wrapper */
+        .single-card-wrapper {
+            /* Aggressively reduced fixed width for a more compact look */
+            flex: 0 0 250px; 
+            scroll-snap-align: center; 
+            transition: transform 0.5s ease-in-out; 
+            will-change: transform, opacity, z-index;
+            z-index: 10; 
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Adjust fixed width for smaller screens */
+        @media (max-width: 600px) {
+            .single-card-wrapper {
+                flex: 0 0 75%; /* Show 1 full card and a bit of the next */
+                max-width: 75%;
+            }
+        }
+        
+        /* Inner Card Container for Scaling */
+        .single-card-perspective {
+            transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+            transform-origin: center center;
+            width: 100%;
+            height: 320px; 
+        }
+
+        /* --- PERSPECTIVE CLASSES (Set by JS) --- */
+        .scale-center { 
+            transform: scale(1.0); 
+            z-index: 30;
+        }
+        .scale-near { 
+            /* Significantly smaller than center */
+            transform: scale(0.8); 
+            z-index: 20;
+            opacity: 0.85;
+        }
+        .scale-far { 
+            /* Even smaller, pushed behind near cards */
+            transform: scale(0.65); 
+            z-index: 10;
+            opacity: 0.6;
+        }
+        .scale-hidden {
+            transform: scale(0.6);
+            opacity: 0.0;
+        }
+
+        /* Single Arch Card Styling */
+        .single-card {
+            background-color: var(--card-outer);
+            border-radius: 120px 120px 0 0; 
+            padding: 10px 10px 0 10px;
+            height: 100%; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05); 
+            display: flex; flex-direction: column;
+            transition: box-shadow 0.3s;
+        }
+        .single-card:hover { box-shadow: 0 15px 30px rgba(0,0,0,0.2); }
+
+        .single-inner {
+            background: linear-gradient(180deg, var(--glass-start) 0%, var(--glass-end) 100%);
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 110px 110px 0 0;
+            flex: 1; display: flex; align-items: center; justify-content: flex-end; 
+            position: relative; overflow: hidden;
+            box-shadow: inset 0 10px 20px rgba(255,255,255,0.2);
+            padding-bottom: 20px;
+        }
+        
+        .single-card .real-jewelry-img {
+            width: 80px; height: 70px; 
+            margin-bottom: 10px;
+            filter: drop-shadow(0 10px 8px rgba(0,0,0,0.5)); 
+        }
+        
+        .single-card .shelf-plank { bottom: 5px; width: 60%; }
+
+        .single-card .card-footer { padding: 15px; }
+        .single-card .card-footer h3 { font-size: 0.9rem; }
+
+        /* --- 6. Story & Footer --- */
+        .story { padding: 100px 5%; background: #fff; display: flex; gap: 60px; }
+        .story-content { flex: 1; }
+        .story-content h2 { font-size: 3rem; margin-bottom: 20px; color: #222; }
+        footer { padding: 50px; text-align: center; background: #222; color: #888; margin-top: 0; }
+        .floating-ui { position: fixed; right: 30px; bottom: 30px; z-index: 999; }
+        .float-icon { width: 50px; height: 50px; background: #fff; border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.1); color: var(--primary-green); font-size: 1.2rem; }
 
     </style>
 </head>
 <body>
 
+    <div class="cursor-dot" id="cursor-dot"></div>
+
     <header>
         <div class="brand">Aurelia.</div>
         <nav>
             <ul>
-                <li><a href="#">Shop</a></li>
-                <li><a href="#">About</a></li>
+                <li><a href="#" class="hover-trigger">Collections</a></li>
+                <li><a href="#" class="hover-trigger">New Arrivals</a></li>
+                <li><a href="#" class="hover-trigger">Our Story</a></li>
             </ul>
         </nav>
+        <div class="icons">
+            <i class="fas fa-search hover-trigger"></i>
+            <i class="fas fa-shopping-bag hover-trigger"></i>
+            <i class="fas fa-shopping-cart hover-trigger"></i>
+        </div>
     </header>
 
-    <div class="hero">
-        <h1>The Vault</h1>
+    <section class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <small style="font-family:'Playfair Display'; font-style:italic;">Classic Jewellery</small>
+            <h1>Handcrafted Jewelry — <br> Modern Heirlooms</h1>
+            <p>Refined minimalism for the modern muse.</p>
+            <div class="btn hover-trigger">Shop New Arrivals</div>
+        </div>
+    </section>
+
+    <section class="collections">
+        <div class="section-header">
+            <h2>Featured Collections</h2>
+        </div>
+
+        <div class="grid">
+            
+            <div class="arch-card">
+                <div class="card-inner">
+                    <div class="shelf-stack">
+                        <div class="shelf-unit hover-trigger">
+                            <img src="https://raw.githubusercontent.com/nishitatambde-hue/j/main/1.png" class="real-jewelry-img" alt="Jewel 1">
+                            <div class="shelf-plank"></div>
+                        </div>
+                        <div class="shelf-unit hover-trigger">
+                            <img src="https://raw.githubusercontent.com/nishitatambde-hue/j/main/2.png" class="real-jewelry-img" alt="Jewel 2">
+                            <div class="shelf-plank"></div>
+                        </div>
+                        <div class="shelf-unit hover-trigger">
+                            <img src="https://raw.githubusercontent.com/nishitatambde-hue/j/main/3.png" class="real-jewelry-img" alt="Jewel 3">
+                            <div class="shelf-plank"></div>
+                        </div>
+                    </div>
+                    <div class="card-footer"><h3>Bridal Collection</h3></div>
+                </div>
+            </div>
+
+            <div class="arch-card" style="transition-delay: 0.1s;">
+                <div class="card-inner">
+                    <div class="shelf-stack">
+                        <div class="shelf-unit hover-trigger">
+                            <img src="https://raw.githubusercontent.com/nishitatambde-hue/j/main/4.png" class="real-jewelry-img" alt="Jewel 4">
+                            <div class="shelf-plank"></div>
+                        </div>
+                        <div class="shelf-unit hover-trigger">
+                            <img src="https://raw.githubusercontent.com/nishitatambde-hue/j/main/5.png" class="real-jewelry-img" alt="Jewel 5">
+                            <div class="shelf-plank"></div>
+                        </div>
+                        <div class="shelf-unit hover-trigger">
+                            <img src="https://raw.githubusercontent.com/nishitatambde-hue/j/main/6.png" class="real-jewelry-img" alt="Jewel 6">
+                            <div class="shelf-plank"></div>
+                        </div>
+                    </div>
+                    <div class="card-footer"><h3>Gold Essentials</h3></div>
+                </div>
+            </div>
+
+            <div class="arch-card" style="transition-delay: 0.2s;">
+                <div class="card-inner">
+                    <div class="shelf-stack">
+                        <div class="shelf-unit hover-trigger">
+                            <img src="https://raw.githubusercontent.com/nishitatambde-hue/j/main/7.png" class="real-jewelry-img" alt="Jewel 7">
+                            <div class="shelf-plank"></div>
+                        </div>
+                        <div class="shelf-unit hover-trigger">
+                            <img src="https://raw.githubusercontent.com/nishitatambde-hue/j/main/8.png" class="real-jewelry-img" alt="Jewel 8">
+                            <div class="shelf-plank"></div>
+                        </div>
+                        <div class="shelf-unit hover-trigger">
+                            <img src="https://raw.githubusercontent.com/nishitatambde-hue/j/main/9.png" class="real-jewelry-img" alt="Jewel 9">
+                            <div class="shelf-plank"></div>
+                        </div>
+                    </div>
+                    <div class="card-footer"><h3>Vintage Treasures</h3></div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="singles-section">
+        <div class="singles-header">
+            <h2>Curated Singles</h2>
+            <p style="color:#666;">Scroll to see the full 3D collection.</p>
+        </div>
+
+        <div class="carousel-container" id="carousel">
+            
+            <div class="single-card-wrapper" data-index="0">
+                <div class="single-card-perspective">
+                    <div class="single-card hover-trigger">
+                        <div class="single-inner">
+                            <div class="shelf-unit">
+                                <img src="https://raw.githubusercontent.com/nishitatambde-hue/j/main/1.png" class="real-jewelry-img" alt="Single 1">
+                                <div class="shelf-plank"></div>
+                            </div>
+                        </div>
+                        <div class="card-footer"><h3>Diamond Solitaire</h3></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="single-card-wrapper" data-index="1">
+                <div class="single-card-perspective">
+                    <div class="single-card hover-trigger">
+                        <div class="single-inner">
+                            <div class="shelf-unit">
+                                <img src="https://raw.githubusercontent.com/nishitatambde-hue/j/main/3.png" class="real-jewelry-img" alt="Single 2">
+                                <div class="shelf-plank"></div>
+                            </div>
+                        </div>
+                        <div class="card-footer"><h3>Emerald Pendant</h3></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="single-card-wrapper" data-index="2">
+                <div class="single-card-perspective">
+                    <div class="single-card hover-trigger">
+                        <div class="single-inner">
+                            <div class="shelf-unit">
+                                <img src="https://raw.githubusercontent.com/nishitatambde-hue/j/main/5.png" class="real-jewelry-img" alt="Single 3">
+                                <div class="shelf-plank"></div>
+                            </div>
+                        </div>
+                        <div class="card-footer"><h3>Gold Band</h3></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="single-card-wrapper" data-index="3">
+                <div class="single-card-perspective">
+                    <div class="single-card hover-trigger">
+                        <div class="single-inner">
+                            <div class="shelf-unit">
+                                <img src="https://raw.githubusercontent.com/nishitatambde-hue/j/main/7.png" class="real-jewelry-img" alt="Single 4">
+                                <div class="shelf-plank"></div>
+                            </div>
+                        </div>
+                        <div class="card-footer"><h3>Royal Ruby</h3></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="single-card-wrapper" data-index="4">
+                <div class="single-card-perspective">
+                    <div class="single-card hover-trigger">
+                        <div class="single-inner">
+                            <div class="shelf-unit">
+                                <img src="https://raw.githubusercontent.com/nishitatambde-hue/j/main/2.png" class="real-jewelry-img" alt="Single 5">
+                                <div class="shelf-plank"></div>
+                            </div>
+                        </div>
+                        <div class="card-footer"><h3>Pearl Droplets</h3></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="single-card-wrapper" data-index="5">
+                <div class="single-card-perspective">
+                    <div class="single-card hover-trigger">
+                        <div class="single-inner">
+                            <div class="shelf-unit">
+                                <img src="https://raw.githubusercontent.com/nishitatambde-hue/j/main/8.png" class="real-jewelry-img" alt="Single 6">
+                                <div class="shelf-plank"></div>
+                            </div>
+                        </div>
+                        <div class="card-footer"><h3>Antique Brooch</h3></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="story">
+        <div class="story-content">
+            <h2>Our Story</h2>
+            <p>Our longing for authentic connection and the desire for the refined craft led us to seek out the best jewelers in the world. What started as a small personal collection has since expanded into a beloved brand.</p>
+            <div class="btn hover-trigger">Read More</div>
+        </div>
+        <div class="story-img">
+            <img src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Story">
+        </div>
+    </section>
+
+    <div class="floating-ui">
+        <div class="float-icon hover-trigger"><i class="far fa-heart"></i></div>
+        <div class="float-icon hover-trigger"><i class="far fa-comment"></i></div>
     </div>
 
-    <div class="grid">
-        
-        <div class="arch-card reveal active">
-            <div class="card-inner">
-                <div class="shelf-stack">
-                    
-                    <div class="shelf-unit">
-                        <img src="https://cdn-icons-png.flaticon.com/512/1973/1973957.png" class="real-jewelry-img" alt="Ring">
-                        <div class="shelf-plank"></div>
-                        <div class="shelf-tag">Solitaire Ring - $3,200</div>
-                    </div>
-
-                    <div class="shelf-unit">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3233/3233663.png" class="real-jewelry-img" alt="Necklace">
-                        <div class="shelf-plank"></div>
-                        <div class="shelf-tag">Pearl Drop - $1,400</div>
-                    </div>
-
-                    <div class="shelf-unit">
-                        <img src="https://cdn-icons-png.flaticon.com/512/10626/10626883.png" class="real-jewelry-img" alt="Earrings">
-                        <div class="shelf-plank"></div>
-                        <div class="shelf-tag">Gold Studs - $850</div>
-                    </div>
-
-                </div>
-                <div class="card-footer">
-                    <h3>Bridal Set</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="arch-card reveal active" style="transition-delay: 0.2s;">
-            <div class="card-inner">
-                <div class="shelf-stack">
-                    
-                    <div class="shelf-unit">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2855/2855735.png" class="real-jewelry-img" alt="Bangle">
-                        <div class="shelf-plank"></div>
-                        <div class="shelf-tag">Cuff Bangle - $600</div>
-                    </div>
-
-                    <div class="shelf-unit">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2953/2953363.png" class="real-jewelry-img" alt="Diamond">
-                        <div class="shelf-plank"></div>
-                        <div class="shelf-tag">Loose Diamond - $5,000</div>
-                    </div>
-
-                    <div class="shelf-unit">
-                        <img src="https://cdn-icons-png.flaticon.com/512/894/894294.png" class="real-jewelry-img" alt="Watch">
-                        <div class="shelf-plank"></div>
-                        <div class="shelf-tag">Vintage Watch - $3,500</div>
-                    </div>
-
-                </div>
-                <div class="card-footer">
-                    <h3>Luxury Gold</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="arch-card reveal active" style="transition-delay: 0.4s;">
-            <div class="card-inner">
-                <div class="shelf-stack">
-                    
-                    <div class="shelf-unit">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2769/2769711.png" class="real-jewelry-img" alt="Pendant">
-                        <div class="shelf-plank"></div>
-                        <div class="shelf-tag">Sun Pendant - $320</div>
-                    </div>
-
-                    <div class="shelf-unit">
-                        <img src="https://cdn-icons-png.flaticon.com/512/1000/1000780.png" class="real-jewelry-img" alt="Brooch">
-                        <div class="shelf-plank"></div>
-                        <div class="shelf-tag">Leaf Brooch - $180</div>
-                    </div>
-
-                    <div class="shelf-unit">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2237/2237688.png" class="real-jewelry-img" alt="Gem">
-                        <div class="shelf-plank"></div>
-                        <div class="shelf-tag">Sapphire - $2,100</div>
-                    </div>
-
-                </div>
-                <div class="card-footer">
-                    <h3>Nature Collection</h3>
-                </div>
-            </div>
-        </div>
-
-    </div>
+    <footer>
+        <div class="brand">Aurelia.</div>
+        <p style="margin-top:15px; font-size:0.8rem;">&copy; 2025 Aurelia. All rights reserved.</p>
+    </footer>
 
     <script>
-        window.addEventListener('load', () => {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) entry.target.classList.add('active');
-                });
-            });
-            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        const cursorDot = document.getElementById('cursor-dot');
+        const body = document.body;
+        const carousel = document.getElementById('carousel');
+        const wrappers = document.querySelectorAll('.single-card-wrapper');
+
+        // --- Petal Cursor Logic ---
+        document.addEventListener('mousemove', (e) => {
+            cursorDot.style.left = e.clientX + 'px';
+            cursorDot.style.top = e.clientY + 'px';
+            if (Math.random() > 0.5) createPetal(e.clientX, e.clientY);
         });
+
+        function createPetal(x, y) {
+            const petal = document.createElement('div');
+            petal.classList.add('petal');
+            const spread = 60;
+            const startX = x + (Math.random() - 0.5) * spread;
+            const startY = y + (Math.random() - 0.5) * spread;
+            petal.style.left = startX + 'px';
+            petal.style.top = startY + 'px';
+            
+            const hue = Math.random() > 0.5 ? '230, 154, 107' : '255, 180, 140';
+            petal.style.backgroundColor = `rgba(${hue}, 0.7)`;
+            
+            const size = Math.random() * 10 + 5;
+            petal.style.width = size + 'px';
+            petal.style.height = size + 'px';
+            
+            const driftX = (Math.random() - 0.5) * 100 + 'px';
+            petal.style.setProperty('--drift-x', driftX);
+            
+            const duration = (Math.random() * 1.5 + 1) + 's';
+            petal.style.animation = `fall ${duration} forwards ease-in`;
+            
+            body.appendChild(petal);
+            setTimeout(() => petal.remove(), 2500);
+        }
+
+        document.querySelectorAll('a, button, .hover-trigger, .single-card-wrapper').forEach(el => {
+            el.addEventListener('mouseenter', () => body.classList.add('hovering'));
+            el.addEventListener('mouseleave', () => body.classList.remove('hovering'));
+        });
+        
+        // --- 3D Carousel Logic ---
+
+        // Function to find the index of the closest snapping point (the center card)
+        function getClosestCenterIndex() {
+            const scrollLeft = carousel.scrollLeft;
+            const containerWidth = carousel.clientWidth;
+            // Center of the visible container + compensation for padding
+            const centerScroll = scrollLeft + containerWidth / 2;
+            
+            let closestIndex = 0;
+            let minDistance = Infinity;
+            
+            wrappers.forEach((wrapper, index) => {
+                const wrapperCenter = wrapper.offsetLeft + wrapper.offsetWidth / 2;
+                const distance = Math.abs(wrapperCenter - centerScroll);
+                
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestIndex = index;
+                }
+            });
+            return closestIndex;
+        }
+
+        // Applies the scaling and Z-index based on proximity to the center card
+        function updateCarouselPerspective() {
+            if (wrappers.length === 0) return;
+
+            const centerIndex = getClosestCenterIndex();
+            
+            wrappers.forEach((wrapper, index) => {
+                const perspectiveCard = wrapper.querySelector('.single-card-perspective');
+                
+                // Calculate distance from center card
+                const distance = index - centerIndex;
+
+                perspectiveCard.classList.remove('scale-center', 'scale-near', 'scale-far', 'scale-hidden');
+                
+                if (distance === 0) {
+                    perspectiveCard.classList.add('scale-center');
+                } else if (Math.abs(distance) === 1) {
+                    perspectiveCard.classList.add('scale-near');
+                } else if (Math.abs(distance) === 2) {
+                    perspectiveCard.classList.add('scale-far');
+                } else {
+                    perspectiveCard.classList.add('scale-hidden');
+                }
+                
+                // Manually adjust the Z-index (ensures closer cards are always on top)
+                perspectiveCard.style.zIndex = 30 - Math.abs(distance) * 10;
+            });
+        }
+
+        // Initial update and listeners for scroll/resize
+        window.addEventListener('load', () => {
+            // Scroll to center initially (Card 0 will be centered visually)
+            // Need to calculate initial scroll based on where the center snap point is located
+            if (wrappers.length > 0) {
+                 const initialScrollPosition = wrappers[0].offsetLeft - (carousel.clientWidth / 2) + (wrappers[0].offsetWidth / 2);
+                 carousel.scrollLeft = initialScrollPosition;
+            }
+            updateCarouselPerspective();
+        });
+        
+        carousel.addEventListener('scroll', updateCarouselPerspective);
+        window.addEventListener('resize', updateCarouselPerspective);
+        
     </script>
 </body>
 </html>
