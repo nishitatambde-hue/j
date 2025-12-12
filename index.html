@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aurelia. | Real Jewelry Shelf</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-body: #F5F2EA;
+            --primary-green: #2F5C55;
+            --card-outer: #E3DCC8;
+            --card-footer: #3E3025;
+            --gradient-start: #E69A6B;
+            --gradient-end: #C76A3D;
+            --gold: #FFD700;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: var(--bg-body);
+            overflow-x: hidden;
+        }
+
+        /* --- Animations --- */
+        .reveal { opacity: 0; transform: translateY(40px); transition: 1s ease; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* --- Header --- */
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 5%; position: fixed; width: 100%; top: 0; z-index: 100;
+            background: rgba(245, 242, 234, 0.95); backdrop-filter: blur(8px);
+        }
+        .brand { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--primary-green); font-weight: 700; }
+        nav ul { display: flex; gap: 30px; list-style: none; }
+        nav a { font-weight: 700; color: #555; text-decoration: none; }
+
+        /* --- Hero --- */
+        .hero {
+            height: 60vh; display: flex; align-items: center; justify-content: center;
+            background: url('https://images.unsplash.com/photo-1611591437281-460bfbe1220a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80') center/cover;
+            margin-bottom: 60px;
+        }
+        .hero h1 { font-family: 'Playfair Display', serif; font-size: 3.5rem; color: #fff; text-shadow: 0 4px 10px rgba(0,0,0,0.4); }
+
+        /* --- SHELF SECTION --- */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 5% 100px;
+        }
+
+        /* Card Frame */
+        .arch-card {
+            background-color: var(--card-outer);
+            border-radius: 160px 160px 0 0; 
+            padding: 15px 15px 0 15px;
+            height: 650px; 
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.4s ease;
+        }
+        .arch-card:hover { transform: translateY(-10px); }
+
+        /* Gradient Interior */
+        .card-inner {
+            background: linear-gradient(180deg, #E69A6B 0%, #C76A3D 100%);
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 145px 145px 0 0; 
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shelf-stack {
+            flex: 1; display: flex; flex-direction: column;
+            justify-content: space-evenly; padding: 40px 20px 20px;
+        }
+
+        /* --- IMAGE & SHELF STYLING --- */
+        .shelf-unit {
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            height: 120px; /* Space for the item */
+            display: flex;
+            align-items: flex-end; /* Align bottom to sit on shelf */
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        /* KEY CHANGE: Using <img> instead of <i> 
+           Using filter: drop-shadow so the shadow matches the image shape 
+        */
+        .real-jewelry-img {
+            width: 90px;  /* Adjust based on your image size */
+            height: 90px;
+            object-fit: contain;
+            
+            /* This creates the realistic shadow behind the transparent PNG */
+            filter: drop-shadow(0 15px 10px rgba(0,0,0,0.5)); 
+            
+            z-index: 5;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            bottom: -5px; /* Sink slightly into the shelf reflection */
+        }
+
+        /* The Glass Shelf */
+        .shelf-plank {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 8px;
+            width: 70%;
+            background: linear-gradient(90deg, 
+                rgba(255,255,255,0.1) 0%, 
+                rgba(255,255,255,0.6) 50%, 
+                rgba(255,255,255,0.1) 100%);
+            border-radius: 50%;
+            box-shadow: 0 12px 15px rgba(0,0,0,0.3);
+            z-index: 4;
+        }
+
+        /* Hidden Price Tag */
+        .shelf-tag {
+            position: absolute;
+            bottom: -25px;
+            width: 100%;
+            text-align: center;
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            opacity: 0;
+            transform: translateY(-5px);
+            transition: 0.3s;
+            pointer-events: none;
+        }
+
+        /* Hover Effects */
+        .shelf-unit:hover .real-jewelry-img {
+            transform: translateY(-15px) scale(1.1); /* Hop up */
+            filter: drop-shadow(0 25px 15px rgba(0,0,0,0.4)); /* Shadow moves away */
+        }
+        .shelf-unit:hover .shelf-tag { opacity: 1; transform: translateY(0); }
+        .shelf-unit:hover .shelf-plank {
+            background: linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,1), rgba(255,255,255,0.2));
+        }
+
+        /* Footer */
+        .card-footer {
+            background-color: var(--card-footer);
+            color: #fff; padding: 20px; text-align: center; z-index: 10;
+        }
+        .card-footer h3 { font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 5px; color:#f0f0f0; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">Aurelia.</div>
+        <nav>
+            <ul>
+                <li><a href="#">Shop</a></li>
+                <li><a href="#">About</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="hero">
+        <h1>The Vault</h1>
+    </div>
+
+    <div class="grid">
+        
+        <div class="arch-card reveal active">
+            <div class="card-inner">
+                <div class="shelf-stack">
+                    
+                    <div class="shelf-unit">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1973/1973957.png" class="real-jewelry-img" alt="Ring">
+                        <div class="shelf-plank"></div>
+                        <div class="shelf-tag">Solitaire Ring - $3,200</div>
+                    </div>
+
+                    <div class="shelf-unit">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3233/3233663.png" class="real-jewelry-img" alt="Necklace">
+                        <div class="shelf-plank"></div>
+                        <div class="shelf-tag">Pearl Drop - $1,400</div>
+                    </div>
+
+                    <div class="shelf-unit">
+                        <img src="https://cdn-icons-png.flaticon.com/512/10626/10626883.png" class="real-jewelry-img" alt="Earrings">
+                        <div class="shelf-plank"></div>
+                        <div class="shelf-tag">Gold Studs - $850</div>
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <h3>Bridal Set</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="arch-card reveal active" style="transition-delay: 0.2s;">
+            <div class="card-inner">
+                <div class="shelf-stack">
+                    
+                    <div class="shelf-unit">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2855/2855735.png" class="real-jewelry-img" alt="Bangle">
+                        <div class="shelf-plank"></div>
+                        <div class="shelf-tag">Cuff Bangle - $600</div>
+                    </div>
+
+                    <div class="shelf-unit">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2953/2953363.png" class="real-jewelry-img" alt="Diamond">
+                        <div class="shelf-plank"></div>
+                        <div class="shelf-tag">Loose Diamond - $5,000</div>
+                    </div>
+
+                    <div class="shelf-unit">
+                        <img src="https://cdn-icons-png.flaticon.com/512/894/894294.png" class="real-jewelry-img" alt="Watch">
+                        <div class="shelf-plank"></div>
+                        <div class="shelf-tag">Vintage Watch - $3,500</div>
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <h3>Luxury Gold</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="arch-card reveal active" style="transition-delay: 0.4s;">
+            <div class="card-inner">
+                <div class="shelf-stack">
+                    
+                    <div class="shelf-unit">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2769/2769711.png" class="real-jewelry-img" alt="Pendant">
+                        <div class="shelf-plank"></div>
+                        <div class="shelf-tag">Sun Pendant - $320</div>
+                    </div>
+
+                    <div class="shelf-unit">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1000/1000780.png" class="real-jewelry-img" alt="Brooch">
+                        <div class="shelf-plank"></div>
+                        <div class="shelf-tag">Leaf Brooch - $180</div>
+                    </div>
+
+                    <div class="shelf-unit">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2237/2237688.png" class="real-jewelry-img" alt="Gem">
+                        <div class="shelf-plank"></div>
+                        <div class="shelf-tag">Sapphire - $2,100</div>
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <h3>Nature Collection</h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        window.addEventListener('load', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('active');
+                });
+            });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>
